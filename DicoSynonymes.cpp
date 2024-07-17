@@ -82,9 +82,10 @@ namespace TP3
 
     void DicoSynonymes::ajouterFlexion(const std::string& motRadical, const std::string& motFlexion){
     	if(nombreRadicaux() == 0) throw std::logic_error("Le dictionnaire est vide.");
+    	if (rechercheMotRadical(racine, motRadical) == nullptr ) throw std::logic_error("Mot radical n'existe pas");
     	NoeudDicoSynonymes* motCourant = rechercheMotRadical(racine, motRadical);
 
-    	if (std::find(motCourant->flexions.begin(), motCourant->flexions.end(), motFlexion) != motCourant->flexions.end())
+    	if (motCourant->flexions.empty() || std::find(motCourant->flexions.begin(), motCourant->flexions.end(), motFlexion) == motCourant->flexions.end())
     	{
     		motCourant->flexions.push_back(motFlexion);
     	}
