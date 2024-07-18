@@ -96,13 +96,16 @@ namespace TP3
     void DicoSynonymes::ajouterSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe) {
 	    if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
     	if (!appartient(racine, motSynonyme)) ajouterRadical(motSynonyme);
-
-    	if (numGroupe == -1) {
-    		numGroupe = groupesSynonymes.size();
-    	}
-
     	NoeudDicoSynonymes* radical = rechercheMotRadical(racine, motRadical);
     	NoeudDicoSynonymes* synonyme = rechercheMotRadical(racine, motSynonyme);
+
+    	if (numGroupe == -1) {
+    		groupesSynonymes.resize(groupesSynonymes.size()+1);
+    		numGroupe = groupesSynonymes.size()-1;
+    		radical->appSynonymes.push_back(numGroupe);
+    	}
+
+
     	for (auto groupe : radical->appSynonymes)
     	{
     		if (groupe == numGroupe) {
@@ -205,7 +208,7 @@ namespace TP3
     int DicoSynonymes::getNombreSens(std::string radical) const{
     	NoeudDicoSynonymes* rad = rechercheMotRadical(racine, radical);
 
-        return rad->appSynonymes.size();
+        return rad->appSynonymes.size()-1;
     }
 
     std::string DicoSynonymes::getSens(std::string radical, int position) const{
@@ -261,7 +264,7 @@ namespace TP3
     	}
      }
 
-    void DicoSynonymes::_parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, float> v, const std::string & mot) const
+    void DicoSynonymes::_parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, float> &v, const std::string & mot) const
     {
 	    if (racine != 0)
 	    {
@@ -353,15 +356,13 @@ namespace TP3
 	    	}
 	    	else if ( _debalancementADroite(dico) )
 	    	{
-	    		// Lorsque le dÃ©balancement est Ã  droite, on fait un zigZig lorsque le
-	    		// sousArbre penche Ã  droite OU est balancÃ©
 	    		if ( _sousArbrePencheAGauche(dico->droit) ) {
 	    			_zigZagDroit(dico);
 	    		} else {
 	    			_zigZigDroit(dico);
 	    		}
 	    	}
-	    	else //aucun dÃ©balancement, uniquement m.Ã .j. des hauteurs
+	    	else
 	    	{
 	    		if (dico != 0) dico->hauteur = 1 +
 								 std::max( _hauteur(dico->gauche), _hauteur(dico->droit) );

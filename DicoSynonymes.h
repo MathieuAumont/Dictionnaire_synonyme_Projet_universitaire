@@ -262,7 +262,7 @@ namespace TP3
 
 
       /**
-      * \brief Donne le premier synonyme du groupe de synonyme de l'emplacement entrée en paramètre.
+      * \brief Donne le premier synonyme du groupe de synonyme de l'emplacement entrée en paraamètre.
       *
       * \post un string correspondant au premier synonyme est imprimé
       * \post Le dictionnaire reste inchangé.
@@ -325,7 +325,7 @@ namespace TP3
 
     // Ajoutez vos méthodes privées ici !
    	NoeudDicoSynonymes * rechercheMotRadical(NoeudDicoSynonymes* noeudm, const std::string & motRadical ) const;
-   	void _parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, float> v, const std::string & mot) const;
+   	void _parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, float>& v, const std::string & mot) const;
    	void _InsererRadical(NoeudDicoSynonymes* & dico, const std::string &motRadical);
    	void _EnleverRadical( NoeudDicoSynonymes* & dico, const std::string&motRadical);
    	void _enleverSuccMinDroite(NoeudDicoSynonymes * dico);
