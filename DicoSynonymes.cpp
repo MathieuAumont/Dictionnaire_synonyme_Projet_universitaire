@@ -93,9 +93,27 @@ namespace TP3
 
     }
 
-    void DicoSynonymes::ajouterSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe){
+    void DicoSynonymes::ajouterSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe) {
+	    if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
+    	if (!appartient(racine, motSynonyme)) ajouterRadical(motSynonyme);
 
+    	if (numGroupe == -1) {
+    		numGroupe = groupesSynonymes.size();
+    	}
 
+    	NoeudDicoSynonymes* radical = rechercheMotRadical(racine, motRadical);
+    	NoeudDicoSynonymes* synonyme = rechercheMotRadical(racine, motSynonyme);
+    	for (auto groupe : radical->appSynonymes)
+    	{
+    		if (groupe == numGroupe) {
+    			for (auto const radical : groupesSynonymes[groupe]) {
+    				if(radical == synonyme) {
+    					throw std::logic_error("le synonyme est déjà dans le groupe");
+    				}
+    			}
+    			groupesSynonymes[groupe].push_back(synonyme);
+    		}
+    	}
     }
 
     void DicoSynonymes::supprimerRadical(const std::string& motRadical){
@@ -116,6 +134,22 @@ namespace TP3
     }
 
     void DicoSynonymes::supprimerSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe){
+    	if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
+    	if (!appartient(racine, motSynonyme)) throw std::logic_error("Le synonyme n'existe pas.");
+    	NoeudDicoSynonymes* radical = rechercheMotRadical(racine, motRadical);
+    	NoeudDicoSynonymes* synonyme = rechercheMotRadical(racine, motSynonyme);
+    	for (auto groupe : radical->appSynonymes) {
+    		if (groupe == numGroupe) {
+    			auto radicalSynonyme = std::find(groupesSynonymes[groupe].begin(), groupesSynonymes[groupe].end(),synonyme);
+    			if (radicalSynonyme != groupesSynonymes[groupe].end()){
+    				groupesSynonymes[groupe].erase(radicalSynonyme);
+    				}
+    			else {
+    				throw std::logic_error("le synonyme n'existe pas dans ce groupe");
+    			}
+
+    		}
+    	}
     }
 
     bool DicoSynonymes::estVide() const{
@@ -169,21 +203,32 @@ namespace TP3
     }
 
     int DicoSynonymes::getNombreSens(std::string radical) const{
-        return 0;
+    	NoeudDicoSynonymes* rad = rechercheMotRadical(racine, radical);
+
+        return rad->appSynonymes.size();
     }
 
     std::string DicoSynonymes::getSens(std::string radical, int position) const{
-        return "";
+    	NoeudDicoSynonymes* rad = rechercheMotRadical(racine, radical);
+    	std::string synonyme = groupesSynonymes[rad->appSynonymes[position]].front()->radical;
+        return synonyme;
     }
 
     std::vector<std::string> DicoSynonymes::getSynonymes(std::string radical, int position) const{
-        std::vector<std::string> synonymes;
+        NoeudDicoSynonymes* rad = rechercheMotRadical(racine, radical);
+    	std::vector<std::string> synonymes;
+    	for (auto const syn : groupesSynonymes[rad->appSynonymes[position]]) {
+    		synonymes.push_back(syn->radical);
+    	}
         return synonymes;
     }
 
     std::vector<std::string> DicoSynonymes::getFlexions(std::string radical) const
     {
+    	NoeudDicoSynonymes* rad = rechercheMotRadical(racine, radical);
         std::vector<std::string> flexions;
+    	for (auto const flex : rad->flexions)
+    		flexions.push_back(flex);
         return flexions;
     }
 
@@ -358,7 +403,20 @@ namespace TP3
 	    	_zigZigDroit(dico);
 	    }
 
-    	bool DicoSynonymes::_debalancementAGauche(NoeudDicoSynonymes* arbre) const
+	    bool DicoSynonymes::appartient(NoeudDicoSynonymes *racine, const std::string &motRadical) const {
+    	if (racine == nullptr)
+    		return false; //si data nâ€™est pas dans lâ€™arbre
+
+    	if ( motRadical < racine->radical )
+    		return appartient(racine->gauche, motRadical);
+    	else if ( racine->radical < motRadical)
+    		return appartient(racine->droit, motRadical);
+    	else
+    		return true;
+
+	    }
+
+	    bool DicoSynonymes::_debalancementAGauche(NoeudDicoSynonymes* arbre) const
 	    {
 	    	if (arbre == 0)
 	    		return false;

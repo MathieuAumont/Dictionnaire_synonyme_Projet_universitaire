@@ -335,6 +335,7 @@ namespace TP3
    	void  _zigZigDroit(NoeudDicoSynonymes *&dico);
    	void  _zigZagGauche(NoeudDicoSynonymes *&dico);
    	void  _zigZagDroit(NoeudDicoSynonymes *&dico);
+   	bool appartient(NoeudDicoSynonymes* racine, const std::string& motRadical) const;
 
    	bool _debalancementAGauche(NoeudDicoSynonymes * arbre) const;
    	bool _debalancementADroite(NoeudDicoSynonymes * arbre) const;
