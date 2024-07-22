@@ -1,7 +1,7 @@
 /**
 * \file DicoSynonymes.h
 * \brief Interface du type DicoSynonymes
-* \author IFT-2008
+* \author IFT-2008, MathieuAumont(pour ajout méthodes privées)
 * \version 0.1
 * \date juillet 2024
 *

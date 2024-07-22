@@ -17,11 +17,18 @@
 
 namespace TP3
 {
-
-    DicoSynonymes::DicoSynonymes() : racine(nullptr), nbRadicaux(0), groupesSynonymes(0){
+	/**
+	 * \brief Concstructeur DicoSynonymes
+	 *		initialisation des membres privées de la classe
+	 */
+	DicoSynonymes::DicoSynonymes() : racine(nullptr), nbRadicaux(0), groupesSynonymes(0){
     }
 
-    DicoSynonymes::DicoSynonymes(std::ifstream &fichier) {
+	/**
+	 * \brief Constructeur d'un DicoSynonymes à partir d'un fichier
+	 * \param[in] fichier
+	 */
+	DicoSynonymes::DicoSynonymes(std::ifstream &fichier) {
     	if (fichier.is_open())
     	{
     		chargerDicoSynonyme(fichier);
@@ -74,15 +81,33 @@ namespace TP3
 		}
 	}
 
-    DicoSynonymes::~DicoSynonymes(){
+	/**
+	 * \brief Destructeur de la Classe
+	 *		permet de suprimer tous les noeuds non supprimer pour libérer l'espace
+	 */
+	DicoSynonymes::~DicoSynonymes(){
     	_DetruireRadical(racine);
     }
 
-    void DicoSynonymes::ajouterRadical(const std::string& motRadical){
+	/**
+	 * \brief permet d'ajouter un Radical à la classe
+	 *		appelle la méthode privée _InsererRaducal()
+	 * \param[in] motRadical std::string
+	 */
+	void DicoSynonymes::ajouterRadical(const std::string& motRadical){
     	_InsererRadical(racine, motRadical);
     }
 
-    void DicoSynonymes::ajouterFlexion(const std::string& motRadical, const std::string& motFlexion){
+	/**
+	 *
+	 * \brief permet d'ajouter une flexion sur un radical déjè dans le dico.
+	 * \param[in] motRadical std::string le mot dont on veut ajouter une flexion
+	 * \param[in] motFlexion std::strin la flexion à ajouter
+	 * \exception std::logic_error si le dictionnaire est vide.
+	 * \exception std::logic_error si le radical n'existe pas
+	 * \exception std::logic_error si le radical existe déjà
+	 */
+	void DicoSynonymes::ajouterFlexion(const std::string& motRadical, const std::string& motFlexion){
     	if(nombreRadicaux() == 0) throw std::logic_error("Le dictionnaire est vide.");
     	if (rechercheMotRadical(racine, motRadical) == nullptr ) throw std::logic_error("Mot radical n'existe pas");
     	NoeudDicoSynonymes* motCourant = rechercheMotRadical(racine, motRadical);
@@ -95,7 +120,16 @@ namespace TP3
 
     }
 
-    void DicoSynonymes::ajouterSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe) {
+	/**
+	 *
+	 * \brief permet d'ajouter un synonyme dans une groupe appartenant à un radica;
+	 * @param motRadical std::string le radical qu'on veut ajouter un synonyme
+	 * @param motSynonyme std::string le synonyme à ajouter
+	 * @param numGroupe	int le numéro du groupe de synonyme dans notre dico
+	 * \exception std::logic_error le radical n'existe pas
+	 * \exception std::logic_error le synonyme existe déjà
+	 */
+	void DicoSynonymes::ajouterSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe) {
 
     	if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
     	if (!appartient(racine, motSynonyme)) ajouterRadical(motSynonyme);
@@ -123,11 +157,20 @@ namespace TP3
 
     }
 
-    void DicoSynonymes::supprimerRadical(const std::string& motRadical){
+	/**
+	 * \brief méthose public appellant méthode privé _EnleverRadical
+	 * \param[in] motRadical std::string le radical à enlever
+	 */
+	void DicoSynonymes::supprimerRadical(const std::string& motRadical){
     	_EnleverRadical(racine, motRadical );
     }
 
-    void DicoSynonymes::supprimerFlexion(const std::string& motRadical, const std::string& motFlexion){
+	/**
+	 * \brief méthode public appellant la méthode privée _EnleverFlexion()
+	 * \param[in] motRadical std::string le radical dont on veut enlever une flexion
+	 * \param[in] motFlexion std::string la flexion en question
+	 */
+	void DicoSynonymes::supprimerFlexion(const std::string& motRadical, const std::string& motFlexion){
 
     	NoeudDicoSynonymes* motCourant = rechercheMotRadical(racine, motRadical);
     	if (std::find(motCourant->flexions.begin(), motCourant->flexions.end(), motFlexion) == motCourant->flexions.end())
@@ -140,7 +183,16 @@ namespace TP3
     	}
     }
 
-    void DicoSynonymes::supprimerSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe){
+	/**
+	 * \brief suppression d'un synonyme dans un groupe d'un radical
+	 * \param[in] motRadical std::string le radical
+	 * \param[in] motSynonyme std::string le synonyme qu'on veut enlever
+	 * \param[in] numGroupe  le numero du groupe de synonyme
+	 * \exception std::logic_error le radical n'existe pas
+	 * \exception std::logic_error le synonyme n'existe pas
+	 * \exception std::logic_error le synonyme ne fait pas parti du groupe.
+	 */
+	void DicoSynonymes::supprimerSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe){
     	if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
     	if (!appartient(racine, motSynonyme)) throw std::logic_error("Le synonyme n'existe pas.");
     	NoeudDicoSynonymes* radical = rechercheMotRadical(racine, motRadical);
@@ -159,11 +211,19 @@ namespace TP3
     	}
     }
 
-    bool DicoSynonymes::estVide() const{
+	/**
+	 * \brief permet de voir si le Dico est vide
+	 * \return bool true si vide, false si non_vide
+	 */
+	bool DicoSynonymes::estVide() const{
         return nbRadicaux == 0;
     }
 
-    int DicoSynonymes::nombreRadicaux() const{
+	/**
+	 * \brief renvoie le nombre de radicaux dans le dico
+	 * \return int le nombre de radicaux du dico
+	 */
+	int DicoSynonymes::nombreRadicaux() const{
         return nbRadicaux;
     }
 
