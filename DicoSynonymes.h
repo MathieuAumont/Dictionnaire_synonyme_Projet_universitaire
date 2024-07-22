@@ -248,7 +248,7 @@ namespace TP3
       * \post Le dictionnaire reste inchangé.
       *
       */
-      float similitude(const std::string& mot1, const std::string& mot2) const;
+      double similitude(const std::string& mot1, const std::string& mot2) const;
 
 
       /**
@@ -297,7 +297,7 @@ namespace TP3
       *
 	  */
 	  bool estArbreAVL() const;
-   	std::map<std::string, float> parcoursDico(const std::string &mot) const;
+   	std::map<std::string, double> parcoursDico(const std::string &mot) const;
 
    private:
 
@@ -325,7 +325,8 @@ namespace TP3
 
     // Ajoutez vos méthodes privées ici !
    	NoeudDicoSynonymes * rechercheMotRadical(NoeudDicoSynonymes* noeudm, const std::string & motRadical ) const;
-   	void _parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, float>& v, const std::string & mot) const;
+   	void _estArbreAvl(NoeudDicoSynonymes* racine, bool& resultat) const;
+   	void _parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, double>& v, const std::string & mot) const;
    	void _InsererRadical(NoeudDicoSynonymes* & dico, const std::string &motRadical);
    	void _EnleverRadical( NoeudDicoSynonymes* & dico, const std::string&motRadical);
    	void _enleverSuccMinDroite(NoeudDicoSynonymes * dico);

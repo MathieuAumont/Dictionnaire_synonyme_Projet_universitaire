@@ -151,59 +151,60 @@ int main()
 				string mot;
 				while (iss >> mot)
 				{
-					try
-					{
+					try {
 						radical = dicoSyn.rechercherRadical(mot);
-						cout << "Radical trouve: " << radical << endl
-								<< "Pour changer le mot " << mot << ", tappez la lettre o: ";
-						char repch;
-						cin >> repch;
-						if (repch != 'o')
-						{
-							cout << "Le mot " << mot << " ne sera pas change" << endl;
-							resultat += (mot + " ");
-						}
-						else
-						{
-							int nbsens = dicoSyn.getNombreSens(radical);
-							int repin = 1;
-							if (nbsens > 1)
+						if (radical.empty()) {resultat += (mot + " ");continue;}
+							cout << "Radical trouve: " << radical << endl
+									<< "Pour changer le mot " << mot << ", tappez la lettre o: ";
+							char repch;
+							cin >> repch;
+							if (repch != 'o')
 							{
-								for (int j = 0; j < nbsens; j++)
+								cout << "Le mot " << mot << " ne sera pas change" << endl;
+								resultat += (mot + " ");
+							}
+							else
+							{
+								int nbsens = dicoSyn.getNombreSens(radical);
+								int repin = 1;
+								if (nbsens > 1)
 								{
-									cout << "Sens #" << j + 1 << " : ";
-									cout << dicoSyn.getSens(radical, j) << endl;
+									for (int j = 0; j < nbsens; j++)
+									{
+										cout << "Sens #" << j + 1 << " : ";
+										cout << dicoSyn.getSens(radical, j) << endl;
+									}
+									cout << "Quel sens choisissez-vous:? ";
+									cin >> repin;
 								}
-								cout << "Quel sens choisissez-vous:? ";
+								std::vector<std::string> synonymes = dicoSyn.getSynonymes(radical, repin-1);
+								int nbSynonymes = 0;
+								for (vector<string>::const_iterator it = synonymes.begin(); it != synonymes.end(); ++it)
+								{
+									nbSynonymes++;
+									cout << "Synonyme #" << nbSynonymes << ": " << *it << endl;
+								}
+								cout << "Quel synonyme choisissez-vous:? ";
 								cin >> repin;
+								vector<string>::const_iterator it2 = synonymes.begin();
+								for (int k = 0; k != repin - 1; k++)
+									it2++;
+								std::vector<std::string> flexions = dicoSyn.getFlexions(*it2);
+								int nbFlexions = 0;
+								for (vector<string>::const_iterator it = flexions.begin(); it != flexions.end(); ++it)
+								{
+									nbFlexions++;
+									cout << "Flexion #" << nbFlexions << ": " << *it << endl;
+								}
+								cout << "Quelle flexion choisissez-vous?: ";
+								cin >> repin;
+								it2 = flexions.begin();
+								for (int l = 0; l != repin - 1; l++)
+									it2++;
+								resultat += (*it2 + " ");
 							}
-							std::vector<std::string> synonymes = dicoSyn.getSynonymes(radical, repin-1);
-							int nbSynonymes = 0;
-							for (vector<string>::const_iterator it = synonymes.begin(); it != synonymes.end(); ++it)
-							{
-								nbSynonymes++;
-								cout << "Synonyme #" << nbSynonymes << ": " << *it << endl;
-							}
-							cout << "Quel synonyme choisissez-vous:? ";
-							cin >> repin;
-							vector<string>::const_iterator it2 = synonymes.begin();
-							for (int k = 0; k != repin - 1; k++)
-								it2++;
-							std::vector<std::string> flexions = dicoSyn.getFlexions(*it2);
-							int nbFlexions = 0;
-							for (vector<string>::const_iterator it = flexions.begin(); it != flexions.end(); ++it)
-							{
-								nbFlexions++;
-								cout << "Flexion #" << nbFlexions << ": " << *it << endl;
-							}
-							cout << "Quelle flexion choisissez-vous?: ";
-							cin >> repin;
-							it2 = flexions.begin();
-							for (int l = 0; l != repin - 1; l++)
-								it2++;
-							resultat += (*it2 + " ");
 						}
-					}
+
 					catch (std::logic_error& e)
 					{
 						resultat += (mot + " ");
