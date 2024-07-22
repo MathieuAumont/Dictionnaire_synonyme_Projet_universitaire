@@ -329,6 +329,7 @@ namespace TP3
    	void _parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, double>& v, const std::string & mot) const;
    	void _InsererRadical(NoeudDicoSynonymes* & dico, const std::string &motRadical);
    	void _EnleverRadical( NoeudDicoSynonymes* & dico, const std::string&motRadical);
+   	void _DetruireRadical(NoeudDicoSynonymes*  dico);
    	void _enleverSuccMinDroite(NoeudDicoSynonymes * dico);
    	int  _hauteur(NoeudDicoSynonymes *dico) const;
    	void  _balancer(NoeudDicoSynonymes *&dico);

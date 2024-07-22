@@ -1,7 +1,7 @@
 /**
 * \file DicoSynonymes.cpp
 * \brief Le code des opérateurs du DicoSynonymes.
-* \author IFT-2008, Étudiant(e)
+* \author IFT-2008, Mathiue Aumont, 537196633
 * \version 0.1
 * \date juillet 2024
 *
@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <map>
+#include <cassert>
 
 namespace TP3
 {
@@ -74,6 +75,7 @@ namespace TP3
 	}
 
     DicoSynonymes::~DicoSynonymes(){
+    	_DetruireRadical(racine);
     }
 
     void DicoSynonymes::ajouterRadical(const std::string& motRadical){
@@ -94,7 +96,8 @@ namespace TP3
     }
 
     void DicoSynonymes::ajouterSynonyme(const std::string& motRadical, const std::string& motSynonyme, int& numGroupe) {
-	    if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
+
+    	if (!appartient(racine, motRadical)) throw std::logic_error("Le radical souhaité n'existe pas.");
     	if (!appartient(racine, motSynonyme)) ajouterRadical(motSynonyme);
     	NoeudDicoSynonymes* radical = rechercheMotRadical(racine, motRadical);
     	NoeudDicoSynonymes* synonyme = rechercheMotRadical(racine, motSynonyme);
@@ -117,6 +120,7 @@ namespace TP3
     			groupesSynonymes[groupe].push_back(synonyme);
     		}
     	}
+
     }
 
     void DicoSynonymes::supprimerRadical(const std::string& motRadical){
@@ -170,11 +174,10 @@ namespace TP3
 		std::map<std::string,double> valeurDico  = parcoursDico(mot);
     	std::string resultat;
 
-    	for (auto const element& : valeurDico) {
+    	for (auto element : valeurDico) {
     		if(resultat.empty()) { resultat = element.first;
-    			continue;
     		}
-    		if(element.second > valeurDico[resultat]) resultat = element.first;
+    		else if(element.second > valeurDico[resultat]) resultat = element.first;
     	}
     	if (valeurDico[resultat] == 0.0) return "";
         return resultat;
@@ -184,8 +187,9 @@ namespace TP3
     {
     	double resultat = 0.0;
     	int max_size = std::max(mot1.size(), mot2.size());
-    	std::vector<int> verifResultat(max_size);
-    	for (auto i = 0; i < max_size; i++)
+    	int min_size = std::min(mot1.size(), mot2.size());
+    	std::vector<int> verifResultat(min_size);
+    	for (auto i = 0; i < min_size; i++)
     		if (mot1[i] == mot2[i]) {
     			verifResultat[i] = 1;
     			resultat++;
@@ -225,6 +229,7 @@ namespace TP3
         std::vector<std::string> flexions;
     	for (auto const flex : rad->flexions)
     		flexions.push_back(flex);
+    	if(flexions.empty()) flexions.push_back(radical);
         return flexions;
     }
 
@@ -286,7 +291,8 @@ namespace TP3
 
      void DicoSynonymes::_parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, double> &v, const std::string & mot) const
     {
-	    if (racine != 0)
+
+	    if (racine != nullptr)
 	    {
 	    	_parcoursDico(racine->gauche, v,mot);
 	    	v[racine->radical] = similitude(racine->radical, mot);
@@ -296,7 +302,7 @@ namespace TP3
 
     	void DicoSynonymes::_InsererRadical(NoeudDicoSynonymes*& dico, const std::string& motRadical)
 	    {
-	    	if (dico == 0)
+	    	if (dico == nullptr)
 	    	{
 	    		dico = new NoeudDicoSynonymes(motRadical);
 	    		nbRadicaux++;
@@ -309,24 +315,26 @@ namespace TP3
 	    	else
 	    		throw std::logic_error("Les duplicatats sont interdits");
 
+
+
 	    	_balancer(dico);
 
 	    }
 
     	void DicoSynonymes::_EnleverRadical(NoeudDicoSynonymes*& dico, const std::string& motRadical)
 	    {
-	    	if( dico==0 ) throw std::logic_error("Tentative d'enlever une donnée absente");
+	    	if( dico==nullptr ) throw std::logic_error("Tentative d'enlever une donnée absente");
 	    	if( motRadical < dico->radical ) _EnleverRadical( dico->gauche, motRadical);
 	    	else if( dico->radical < motRadical ) _EnleverRadical( dico->droit, motRadical);
 
-	    	else if( dico->gauche != 0 && dico->droit != 0 )
+	    	else if( dico->gauche != nullptr && dico->droit != nullptr )
 	    	{
 	    		_enleverSuccMinDroite(dico);
 	    	}
 	    	else
 	    	{
 	    		NoeudDicoSynonymes * vieuxNoeud = dico;
-	    		dico = ( dico->gauche != 0 ) ? dico->gauche : dico->droit;
+	    		dico = ( dico->gauche != nullptr ) ? dico->gauche : dico->droit;
 	    		delete vieuxNoeud;
 	    		--nbRadicaux;
 	    	}
@@ -335,12 +343,25 @@ namespace TP3
 
 	    }
 
-    	void DicoSynonymes::_enleverSuccMinDroite(NoeudDicoSynonymes* dico)
+	    void DicoSynonymes::_DetruireRadical(NoeudDicoSynonymes * dico) {
+
+	    	if(dico == nullptr) return;
+	    	if (dico->gauche == nullptr && dico->droit == nullptr) return;
+	    	if(dico->gauche != nullptr)
+	    		_DetruireRadical(dico->gauche);
+	    	if(dico->droit != nullptr)
+	    		_DetruireRadical(dico->droit);
+    	dico->flexions.clear();
+    	dico->appSynonymes.clear();
+    	delete dico;
+	    }
+
+	    void DicoSynonymes::_enleverSuccMinDroite(NoeudDicoSynonymes* dico)
 	    {
 
 	    	NoeudDicoSynonymes * temp = dico->droit;
 	    	NoeudDicoSynonymes * parent = dico;
-	    	while ( temp->gauche != 0)
+	    	while ( temp->gauche != nullptr)
 	    	{
 	    		parent = temp;
 	    		temp = temp->gauche;
@@ -355,7 +376,7 @@ namespace TP3
 
     	int DicoSynonymes::_hauteur(NoeudDicoSynonymes* dico) const
 	    {
-	    	if (dico == 0)
+	    	if (dico == nullptr)
 	    		return -1;
 	    	return dico->hauteur;
 
@@ -383,7 +404,7 @@ namespace TP3
 	    	}
 	    	else
 	    	{
-	    		if (dico != 0) dico->hauteur = 1 +
+	    		if (dico != nullptr) dico->hauteur = 1 +
 								 std::max( _hauteur(dico->gauche), _hauteur(dico->droit) );
 	    	}
 
@@ -425,7 +446,7 @@ namespace TP3
 
 	    bool DicoSynonymes::appartient(NoeudDicoSynonymes *racine, const std::string &motRadical) const {
     	if (racine == nullptr)
-    		return false; //si data nâ€™est pas dans lâ€™arbre
+    		return false;
 
     	if ( motRadical < racine->radical )
     		return appartient(racine->gauche, motRadical);
@@ -438,33 +459,33 @@ namespace TP3
 
 	    bool DicoSynonymes::_debalancementAGauche(NoeudDicoSynonymes* arbre) const
 	    {
-	    	if (arbre == 0)
+	    	if (arbre == nullptr)
 	    		return false;
     	return 1 < _hauteur(arbre->gauche) - _hauteur(arbre->droit);
 	    }
 
     	bool DicoSynonymes::_debalancementADroite(NoeudDicoSynonymes* arbre) const
-    {		bool resultat = false;
-	    	if (arbre == 0)
+    {
+	    	if (arbre == nullptr)
 	    		return false;
     	return 1 < _hauteur(arbre->droit) - _hauteur(arbre->gauche);
 	    }
 
     	bool DicoSynonymes::_sousArbrePencheAGauche(NoeudDicoSynonymes* arbre) const
 	    {
-	    	if (arbre == 0)
+	    	if (arbre == nullptr)
 	    		return false;
 	    	return _hauteur(arbre->droit) < _hauteur(arbre->gauche);
 	    }
 
     	bool DicoSynonymes::_sousArbrePencheADroite(NoeudDicoSynonymes* arbre) const
 	    {
-	    	if (arbre == 0)
+	    	if (arbre == nullptr)
 	    		return false;
 	    	return _hauteur(arbre->gauche) < _hauteur(arbre->droit);
 
 	    }
 
-    	// Mettez l'implantation des autres méthodes (surtout privées) ici.
+
 
 }//Fin du namespace
