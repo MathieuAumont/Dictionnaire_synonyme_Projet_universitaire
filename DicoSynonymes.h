@@ -248,7 +248,7 @@ namespace TP3
       * \post Le dictionnaire reste inchangé.
       *
       */
-      double similitude(const std::string& mot1, const std::string& mot2) const;
+      static double similitude(const std::string& mot1, const std::string& mot2) ;
 
 
       /**
@@ -323,13 +323,15 @@ namespace TP3
       std::vector< std::list<NoeudDicoSynonymes*> > groupesSynonymes;   // Tableau de groupes de synonymes dont chaque élément est une liste
       	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	// de pointeurs sur des noeuds de l'arbre représentant les radicaux.
 
-    // Ajoutez vos méthodes privées ici !
-   	NoeudDicoSynonymes * rechercheMotRadical(NoeudDicoSynonymes* noeudm, const std::string & motRadical ) const;
+    // mes méthodes privées qui semblaient essentielles
+   	NoeudDicoSynonymes * rechercheMotRadical(NoeudDicoSynonymes* noeud, const std::string & motRadical ) const;
    	void _estArbreAvl(NoeudDicoSynonymes* racine, bool& resultat) const;
    	void _parcoursDico(NoeudDicoSynonymes* racine, std::map<std::string, double>& v, const std::string & mot) const;
+
+   	//toutes les méthodes vues en classe et nécessaire pour le projet
    	void _InsererRadical(NoeudDicoSynonymes* & dico, const std::string &motRadical);
    	void _EnleverRadical( NoeudDicoSynonymes* & dico, const std::string&motRadical);
-   	void _DetruireRadical(NoeudDicoSynonymes*  dico);
+   	void _DetruireRadical(NoeudDicoSynonymes*  &dico);
    	void _enleverSuccMinDroite(NoeudDicoSynonymes * dico);
    	int  _hauteur(NoeudDicoSynonymes *dico) const;
    	void  _balancer(NoeudDicoSynonymes *&dico);

@@ -153,10 +153,7 @@ int main()
 				{
 					try {
 						radical = dicoSyn.rechercherRadical(mot);
-						if (radical.empty()) {
-							std::cout<< mot;
-							resultat += (mot + " ");
-							continue;}
+
 							cout << "Radical trouve: " << radical << endl
 									<< "Pour changer le mot " << mot << ", tappez la lettre o: ";
 							char repch;
